@@ -1,48 +1,15 @@
 import * as THREE from "https://unpkg.com/three@0.181.1/build/three.module.js";
-const $=s=>document.querySelector(s);
-const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-window.addEventListener("load",()=>setTimeout(()=>$(".loader")?.classList.add("done"),1200));
-
-function makeScene(canvas,{wire=false}={}){
- if(!canvas)return null;
- const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);
- const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
- renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;
- camera.position.z=5;
- const group=new THREE.Group();scene.add(group);
- const main=new THREE.Mesh(new THREE.IcosahedronGeometry(1.45,5),new THREE.MeshPhysicalMaterial({color:0xd7ff3f,metalness:.55,roughness:.14,clearcoat:1,transmission:.1}));
- group.add(main);
- if(wire)group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1.58,2),new THREE.MeshBasicMaterial({color:0x8d7cff,wireframe:true,transparent:true,opacity:.2})));
- for(let i=0;i<3;i++){let r=new THREE.Mesh(new THREE.TorusGeometry(1.85+i*.3,.009,8,180),new THREE.MeshBasicMaterial({color:i===1?0xff4fa3:0xffffff,transparent:true,opacity:.22}));r.rotation.x=.8+i*.38;r.rotation.z=i*.7;group.add(r)}
- scene.add(new THREE.AmbientLight(0xffffff,.55));
- const a=new THREE.PointLight(0xd7ff3f,28,12);a.position.set(3,2,4);scene.add(a);
- const b=new THREE.PointLight(0x8d7cff,20,10);b.position.set(-4,-2,2);scene.add(b);
- return {scene,camera,renderer,group,main};
-}
-const hero=makeScene($("#hero3d"),{wire:true}),orb=makeScene($("#orb3d"),{wire:true});
-let sy=0,targetY=0,mx=0,my=0;
-addEventListener("scroll",()=>targetY=scrollY,{passive:true});
-addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
-function frame(){
- sy+=(targetY-sy)*.055;
- if(hero){let p=clamp(sy/innerHeight,0,4);hero.group.rotation.y+=.002+mx*.003;hero.group.rotation.x+=(my*.3-hero.group.rotation.x)*.025;hero.group.position.y=-p*.18;hero.group.scale.setScalar(1+p*.035);hero.camera.position.z=5+p*.22;hero.renderer.render(hero.scene,hero.camera)}
- if(orb){orb.group.rotation.y+=.004;orb.group.rotation.x+=(my*.2-orb.group.rotation.x)*.02;orb.group.position.x+=(mx*.35-orb.group.position.x)*.03;orb.renderer.render(orb.scene,orb.camera)}
- requestAnimationFrame(frame)
-} frame();
-
-function resize(){
- [hero,orb].forEach(x=>{if(!x)return;x.camera.aspect=innerWidth/innerHeight;x.camera.updateProjectionMatrix();x.renderer.setSize(innerWidth,innerHeight);x.renderer.setPixelRatio(Math.min(devicePixelRatio,1.7))})
-}addEventListener("resize",resize);
-
-const cursor=$(".cursor");let cx=innerWidth/2,cy=innerHeight/2,tx=cx,ty=cy;
-if(cursor&&matchMedia("(pointer:fine)").matches){addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY});(function loop(){cx+=(tx-cx)*.18;cy+=(ty-cy)*.18;cursor.style.left=cx+"px";cursor.style.top=cy+"px";requestAnimationFrame(loop)})();document.querySelectorAll("a,.magnetic,.card").forEach(el=>{el.addEventListener("mouseenter",()=>{cursor.style.width="52px";cursor.style.height="52px"});el.addEventListener("mouseleave",()=>{cursor.style.width="18px";cursor.style.height="18px"})})}
-
-const lab=$(".lab"),core=$(".lab-core");
-lab?.addEventListener("pointermove",e=>{const r=lab.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;core.style.transform=`translate(${x*150}px,${y*100}px) scale(1.08)`});
-lab?.addEventListener("pointerleave",()=>core.style.transform="translate(0,0) scale(1)");
-
-document.querySelectorAll(".magnetic").forEach(el=>el.addEventListener("pointermove",e=>{const r=el.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;el.style.transform=`translate(${x*.08}px,${y*.08}px)`}));
+const $=s=>document.querySelector(s), clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+addEventListener("load",()=>setTimeout(()=>$(".loader")?.classList.add("done"),1700));
+function scene(canvas){if(!canvas)return null;const s=new THREE.Scene(),c=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,100),r=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,1.7));r.setSize(innerWidth,innerHeight);r.outputColorSpace=THREE.SRGBColorSpace;c.position.z=5.8;const g=new THREE.Group();s.add(g);const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1.35,5),new THREE.MeshPhysicalMaterial({color:0x8f7cff,metalness:.55,roughness:.12,clearcoat:1,transmission:.15}));g.add(core);g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1.53,2),new THREE.MeshBasicMaterial({color:0xd8ff35,wireframe:true,transparent:true,opacity:.17})));for(let i=0;i<5;i++){const t=new THREE.Mesh(new THREE.TorusGeometry(1.7+i*.28,.008,8,180),new THREE.MeshBasicMaterial({color:[0xd8ff35,0x8f7cff,0xff4fa3,0x64e8ff,0xffffff][i],transparent:true,opacity:.18}));t.rotation.set(.6+i*.35,i*.4,i*.7);g.add(t)}s.add(new THREE.AmbientLight(0xffffff,.5));const a=new THREE.PointLight(0xd8ff35,25,12);a.position.set(3,2,4);s.add(a);const b=new THREE.PointLight(0x8f7cff,22,12);b.position.set(-4,-2,3);s.add(b);return{s,c,r,g,core}}
+const hero=scene($("#hero3d"));let sy=0,target=0,mx=0,my=0;addEventListener("scroll",()=>target=scrollY,{passive:true});addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+(function tick(){sy+=(target-sy)*.06;if(hero){const p=clamp(sy/innerHeight,0,7);hero.g.rotation.y+=.003+mx*.002;hero.g.rotation.x+=(my*.25-hero.g.rotation.x)*.025;hero.g.position.y=-p*.22;hero.g.position.z=-p*.08;hero.g.scale.setScalar(1+p*.045);hero.r.render(hero.s,hero.c)}requestAnimationFrame(tick)})();
+addEventListener("resize",()=>{if(hero){hero.c.aspect=innerWidth/innerHeight;hero.c.updateProjectionMatrix();hero.r.setSize(innerWidth,innerHeight);hero.r.setPixelRatio(Math.min(devicePixelRatio,1.7))}});
+const cursor=$(".cursor");if(cursor&&matchMedia("(pointer:fine)").matches){let x=innerWidth/2,y=innerHeight/2,tx=x,ty=y;addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY});(function loop(){x+=(tx-x)*.16;y+=(ty-y)*.16;cursor.style.left=x+"px";cursor.style.top=y+"px";requestAnimationFrame(loop)})();document.querySelectorAll("a,button,.magnetic,.tier").forEach(el=>{el.addEventListener("mouseenter",()=>{cursor.style.width="46px";cursor.style.height="46px"});el.addEventListener("mouseleave",()=>{cursor.style.width="16px";cursor.style.height="16px"})})}
+const core=$(".core"),wrap=$(".coreWrap");wrap?.addEventListener("pointermove",e=>{const q=wrap.getBoundingClientRect(),x=(e.clientX-q.left)/q.width-.5,y=(e.clientY-q.top)/q.height-.5;core.style.transform=`translate3d(${x*90}px,${y*70}px,45px) rotateX(${-y*20}deg) rotateY(${x*25}deg) scale(1.08)`});wrap?.addEventListener("pointerleave",()=>core.style.transform="");
+document.querySelectorAll(".magnetic").forEach(el=>el.addEventListener("pointermove",e=>{const q=el.getBoundingClientRect(),x=e.clientX-q.left-q.width/2,y=e.clientY-q.top-q.height/2;el.style.transform=`translate(${x*.08}px,${y*.08}px)`}));
 document.querySelectorAll(".magnetic").forEach(el=>el.addEventListener("pointerleave",()=>el.style.transform=""));
-
-const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("in")}),{threshold:.12});
-document.querySelectorAll("section").forEach(s=>io.observe(s));
+const flip=$(".flipBox");$("#flipBtn")?.addEventListener("click",()=>flip.classList.add("flipped"));$("#flipBack")?.addEventListener("click",()=>flip.classList.remove("flipped"));
+const data={core:{name:"NOVA / THE CORE",head:"One world.<br>One unforgettable entrance.",list:["Cinematic hero","Responsive design system","Motion direction","SEO foundation"]},pro:{name:"NOVA PRO / THE SYSTEM",head:"A complete identity that<br>moves as one.",list:["Multi-page experience","Custom motion language","3D / interaction layer","Conversion architecture"]},max:{name:"NOVA MAX / THE UNIVERSE",head:"Your brand becomes<br>a digital product.",list:["Advanced 3D / WebGL","Commerce / custom tools","Immersive interactions","Bespoke engineering"]}};
+document.querySelectorAll(".tier").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll(".tier").forEach(x=>x.classList.remove("active"));t.classList.add("active");const d=data[t.dataset.tier];$("#tierName").textContent=d.name;$("#tierHead").innerHTML=d.head;$("#tierList").innerHTML=d.list.map(x=>"<li>"+x+"</li>").join("")}));
+const observer=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.dataset.visible="true"}),{threshold:.1});document.querySelectorAll(".scene").forEach(x=>observer.observe(x));
